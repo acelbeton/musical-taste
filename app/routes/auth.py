@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, redirect, request, session
 from urllib.parse import urlencode
 import secrets
 import string
@@ -17,7 +17,7 @@ REDIRECT_URI = "http://127.0.0.1:5000/auth/callback"
 @auth_bp.route('login')
 def login():
     state = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(16))
-    scope = 'user-read-private user-read-email'
+    scope = 'user-read-private user-read-email user-top-read'
     state_key = 'spotify_auth_state'
 
     params = {
@@ -54,6 +54,8 @@ def login_callback():
     }
 
     response = requests.post(SPOTIFY_TOKEN_URL, data=token_data, headers=headers)
-
-    return response.json()
+    response_json = response.json()
+    session["access_token"] = response_json["access_token"]
+    
+    return response_json
     
