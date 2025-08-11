@@ -4,16 +4,21 @@ from urllib.parse import urlencode
 import os
 import requests
 import base64
+import pandas as pd
 
 get_data_bp = Blueprint('get_data', __name__)
 load_dotenv()
 
 @get_data_bp.route('top-tracks')
 def top_tracks():
-    spotify_url = " https://api.spotify.com/v1/me/top/tracks"
-    limit = 10
-    time_range = "long_term"
     access_token = session.get("access_token")
+
+    if not access_token:
+        return redirect("/auth/login")
+    
+    spotify_url = " https://api.spotify.com/v1/me/top/tracks"
+    limit = 50
+    time_range = "long_term"
 
     headers = {
         "Authorization": "Bearer " + access_token
@@ -25,5 +30,9 @@ def top_tracks():
     }
 
     response = requests.get(spotify_url + "?" + urlencode(params), headers=headers)
-    return response.json()
+    
+    fetched_data = response.json()
+    df = pd.DataFrame(fetched_data["items"])
 
+    print(df)
+    return fetched_data

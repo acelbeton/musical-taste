@@ -56,6 +56,6 @@ def login_callback():
     response = requests.post(SPOTIFY_TOKEN_URL, data=token_data, headers=headers)
     response_json = response.json()
     session["access_token"] = response_json["access_token"]
-    
+
     return response_json
     
