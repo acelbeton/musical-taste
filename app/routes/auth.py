@@ -16,7 +16,8 @@ REDIRECT_URI = "http://127.0.0.1:5000/auth/callback"
 
 @auth_bp.route('login')
 def login():
-    state = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(16))
+    state = secrets.token_urlsafe(16)
+    session['oauth_state'] = state
     scope = 'user-read-private user-read-email user-top-read'
     state_key = 'spotify_auth_state'
 
@@ -32,10 +33,10 @@ def login():
 
 @auth_bp.route('callback')
 def login_callback():
-    code = request.args.get("code")
-    print("Error:", request.args.get("error"))
-    print("Code:", code)
-    state = request.args.get("state")
+    code = request.args.get('code')
+    state = request.args.get('state')
+    error = request.args.get('error')
+    
     client_string = os.getenv("SPOTIFY_CLIENT_ID") + ':' + os.getenv("SPOTIFY_CLIENT_SECRET")
     client_string = client_string.encode('utf-8')
     client_string = base64.b64encode(client_string)
@@ -57,5 +58,5 @@ def login_callback():
     response_json = response.json()
     session["access_token"] = response_json["access_token"]
 
-    return response_json
+    return redirect("http://localhost:4200/dashboard")
     

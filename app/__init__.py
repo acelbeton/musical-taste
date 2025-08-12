@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from .routes.auth import auth_bp
 from .routes.get_data import get_data_bp
 import secrets
@@ -11,6 +12,7 @@ import dotenv
 def create_app(config_object=None):
     app = Flask(__name__)
     app.secret_key = secrets.token_hex(16) # csak tesztelésre
+    CORS(app, origins=['http://localhost:4200'])
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv("SQLALCHEMY_TRACK_MODIFICATIONS")
